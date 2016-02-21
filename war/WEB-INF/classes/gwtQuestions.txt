@@ -1,0 +1,138 @@
+----------------
+GWT questions :
+----------------
+
+-------------------------
+DAY1: Building a GWT App
+-------------------------
+
+
+
+1. Why compiling takes 5 to 6 permutations ?
+2. Get the difference GreetingService.java, GreetingServiceAsync.java, GreetingServiceImpl.java GWT sample RPC classes ?
+
+Q.3. Is it possible for a GWT application not to have entry point class ?
+Ans:
+----
+If a GWT module has no entry point, then it can only be inherited by other modules. It is possible to include other modules that have entry points specified in their module XML files. If so, then your module would have multiple entry points. Each entry point is executed in sequence.
+
+4. What is the significance of RemoteService marker interface ?
+Ans: Marker interface that RPC interfaces should extend.
+
+5. What is the significance of RemoteServiceServlet class ?
+Ans: It is the servlet base class for your RPC service implementations that automatically deserializes incoming requests from the client and serializes outgoing responses for client/server RPCs
+
+5. What is AsyncCallback interface ?
+Ans: The primary interface a caller must implement to receive a response from a remote procedure call. If an RPC is successful, then {@link #onSuccess(Object)} is called, otherwise {@link #onFailure(Throwable)} is called.
+
+public interface AsyncCallback<T> {
+
+void onFailure(Throwable caught);
+void onSuccess(T result);
+
+}
+
+6. What is RootPanel ?
+Ans: A RootPanel is a panel which is not visible in the user interface. A Root panel is the container for the dynamic elements of your application. It is at the top of any GWT user interface hierarchy. There are two ways you can use a Root panel, either to generate the entire body of the page or to generate specific elements embedded in the body.
+
+RootPanel.get()             // Default. Wraps the HTML body element.
+RootPanel.get("stockList")  // Wraps any HTML element with an id of "stockList"
+
+7. Adapterclass diff with Abstractclass
+
+8. What is Automatic Resource Inclusion ?
+Ans: When you compile StockWatcher, the GWT compiler will bundle all the static resources required to run your application including the style sheets. This mechanism is called Automatic Resource Inclusion.
+
+9. Why secondary style needs to be dependent on primary style or what are dependent styles ?
+Ans: Add a secondary style to the Remove button element. But this time, you’ll make the secondary style dependent on the primary style. Dependent styles are powerful because they are automatically updated whenever the primary style name changes. In contrast, secondary style names that are not dependent style names are not automatically updated when the primary style name changes.
+
+(**)
+Now the resulting generated HTML has two class attributes.
+<button class="gwt-Button gwt-Button-remove" tabindex="0" type="button">x</button>
+
+10. What is Deferred Binding ?
+Ans: At runtime, GWT uses a mechanism called deferred binding to load the correct permutation for the end user’s browser. 
+Deferred binding serves just the code the user needs and no more.
+
+What are the benefits of deferred binding? Because each permutation is tailored to work around the bugs and idiosyncrasies of its intended web browser, using deferred binding is
+
+    *. Faster for the user. Your application download contains no unnecessary bytes. The application doesn’t need to sniff for browsers or provide multiple branches for each browser.
+    *. Faster for you. GWT does the work of generating the correct JavaScript for each browser so that you don’t have to spend so much time dealing with differences between browsers.
+
+In addition to browser detection, deferred binding can also generate customized versions of your application for any number of other variables. One very common example is internationalization. With deferred binding, GWT generates a separate implementation of the application for each language, so for example, an English speaker doesn’t have to download the French text (and vice versa).
+
+-------------------------
+DAY2: Ajax Communication
+-------------------------
+
+11. What are the implementation strategies to communicate with server in GWT ?
+Ans: GWT provides a few different ways to communicate with a server. Which data format you use will ultimately depend on the server you need to interact with.
+They are:
+---------
+1. Making Remote Procedure Calls (GWT RPC)
+2. Retrieving JSON Data via HTTP
+3. Making Cross-Site Requests for JSONP
+
+12. What is GWT RPC?
+
+The GWT RPC framework makes it easy for the client and server components of your web application to exchange Java objects over HTTP.The server-side code that gets invoked from the client is often referred to as a service. 
+"The implementation of a GWT RPC service is based on the well-known Java servlet architecture. Within the client code, you’ll use an automatically-generated proxy class to make calls to the service. GWT will handle serialization of the Java objects passing back and forth—the arguments in the method calls and the return value."
+
+Important: GWT RPC services are not the same as web services based on SOAP or REST. They are simply as a lightweight method for transferring data between your server and the GWT application on the client.
+
+
+13. What are the Java components of the GWT RPC Mechanism ? 
+Ans: 
+ 1. the service that runs on the server (the method you are calling)
+ 2. the client code that invokes the service
+ 3. the Java data objects that pass between the client and server
+
+Both the server and the client have the ability to serialize and deserialize data so the data objects can be passed between them as ordinary text.
+
+14. What is RemoteServiceServlet ?
+Ans: RemoteServiceServlet automatically handles serialization of the data being passed between the client and the server and invoking the intended method in your service implementation.
+A service implementation must extend RemoteServiceServlet and must implement the associated service interface. Notice that the service implementation does not implement the asynchronous version of the service interface. "Every service implementation is ultimately a servlet, but rather than extending HttpServlet, it extends RemoteServiceServlet instead." 
+
+15. What packages to include on the server side ?
+Ans: Remember the code on the server runs as java byte code. So we need to include packages from java library not gwt sdk.
+Remember the service implementation runs on the server as Java bytecode, so you can use any Java class or library without worrying about whether it’s translatable to JavaScript. In this case, you can use the Random class from the Java runtime library (java.util.Random) instead of the emulated GWT version (com.google.gwt.user.client.Random).
+
+16. How to include the server side code in Gwt module ?
+Ans:The embedded servlet container (Jetty) can host the servlets that contain your service implementation. This means you can take advantage of running your application in development mode while testing and debugging the server-side Java code.
+
+To set this up, add <servlet> and <servlet-mapping> elements to the web application deployment descriptor (web.xml) and point to the implementation class (StockPriceServiceImpl).
+
+Starting with GWT 1.6, servlets should be defined in the web application deployment descriptor (web.xml) instead of the GWT module (StockWatcher.gwt.xml).
+
+In the <servlet-mapping> element, the url-pattern can be in the form of an absolute directory path (for example, /spellcheck or /common/login). "If you specify a default service path with a @RemoteServiceRelativePath annotation on the service interface (as you did with StockPriceService), then make sure the url-pattern matches the annotation value."
+
+Because you’ve mapped the StockPriceService to “stockPrices” and the module rename-to attribute in StockWatcher.gwt.xml is “stockwatcher”, the full URL will be:
+
+http://localhost:8888/stockwatcher/stockPrices
+
+17. How to create the servcie proxy class ?
+Ans: create an instance of the service proxy class by calling GWT.create(Class).
+ex: private StockPriceServiceAsync stockPriceSvc = GWT.create(StockPriceService.class);
+
+18. Serializing Java objects in GWT ?
+Ans: Serialization is the process of packaging the contents of an object so that it can moved from one application to another application or stored for later use. Anytime you transfer an object over the network via GWT RPC, it must be serialized. Specifically, GWT RPC requires that all service method parameters and return types be serializable.
+
+It implements either Java Serializable or GWT IsSerializable interface, either directly, or because it derives from a superclass that does.
+
+19. How exceptions are handled in GWT ?
+Ans: When a remote procedure call fails, the cause falls into one of two categories: an unexpected exception or a checked exception. In either case you want to handle the exception and, if necessary, provide feedback to the user.
+
+Unexpected exceptions: 
+----------------------
+Any number of unexpected occurrences could cause the call to a remote procedure to fail: the network could be down; the HTTP server on the other end might not be listening; the DNS server could be on fire, and so forth.
+When unexpected exceptions occur in the service implementation, you can find the full stack trace in the development mode log. 
+On the client-side, the onFailure(Throwable) callback method will receive an InvocationException with the generic message: 
+"The call failed on the server; see server log for details."
+
+Checked exceptions:
+-------------------
+If you know a service method might throw a particular type of exception and you want the client-side code to be able to handle it, you can use checked exceptions. GWT supports the throws keyword so you can add it to your service interface methods as needed. When checked exceptions occur in an RPC service method, GWT will serialize the exception and send it back to the caller on the client for handling.
+
+
+
+

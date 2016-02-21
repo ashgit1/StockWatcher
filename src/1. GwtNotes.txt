@@ -1,0 +1,115 @@
+Main tutorial page: 
+-------------------
+
+http://www.gwtproject.org/doc/latest/tutorial/
+
+Widget page:
+------------
+
+http://www.gwtproject.org/doc/latest/RefWidgetGallery.html
+
+WEBAPPCREATOR:
+--------------
+
+webAppCreator -out MyWebApp com.mycompany.mywebapp.MyWebApp
+
+GWT command-line utility "webAppCreator": 
+These utilities do the work of generating the project subdirectories and files you need to get started.
+
+ex:
+---
+
+webAppCreator -out StockWatcher -junit "C:\eclipse\plugins\org.junit_3.8.2.v200706111738\junit.jar" 
+com.google.gwt.sample.stockwatcher.StockWatcher
+
+-out       : the directory to place the generated files. (StockWatcher)
+-junit     : the fully qualified path name to the junit.jar file on your system
+moduleName : the name of the gwt module to create (com.google.gwt.sample.stockwatcher.StockWatcher)
+
+Running the application:
+------------------------
+
+Note: When using a newer version of the chrome browser use ‘Run as Web Application (GWT Super Dev Mode)’ instead. The ‘Google Web Toolkit Developer Plugin’ needed for the default run mode doesen’t work anymore with newer browsers.
+
+Responsive GWT:
+---------------
+(Write responsive GWT applications for mobile and desktop using Polymer Elements and JsInterop)
+
+CREATING YOUR FIRST APPLICATION:
+--------------------------------
+
+1.
+Project.HelloWorld.gwt.xml: A module descriptor file required for GWT compiler to compile the project.
+
+2. 
+<!-- Inherit the core Web Toolkit stuff. -->
+  <inherits name='com.google.gwt.user.User'/>
+
+ 3.
+ <!-- Specify the app entry point class. -->
+  <entry-point class='com.tutorialspoint.client.HelloWorld'/>
+
+4. Specify the paths for translatable code:
+
+ <source path='client'/>
+ <source path='shared'/>
+
+5. Create your first web application:
+
+cd gwt-2.7.0
+
+
+KEYBOARD EVENTS:
+----------------
+
+To subscribe to keyboard events, you can call the addKeyPressHandler(KeyPressHandler) method and pass it a KeyPressHandler.
+
+For the enter key, you however have to use either KeyDownHandler or KeyUpHandler as Firefox won’t correctly populate the KeyPressEvent; see issue 5003.
+
+
+RPC:
+----
+
+The server-side code that gets invoked from the client is also known as a service; the act of making a remote procedure call is referred to as invoking a service. 
+
+RemoteServiceRelativePath:
+--------------------------
+
+Notice the @RemoteServiceRelativePath annotation. 
+This associates the service with a default path relative to the module base URL.
+
+RemoteServiceServlet does the work of deserializing incoming requests from the client and serializing outgoing responses.
+
+Packaging server-side code:
+---------------------------
+
+The service implementation runs on the server as Java bytecode; it’s not translated into JavaScript. Therefore, the service implementation does not have the same language constraints as the client-side code. To keep the code for the client separate from the code for the server, you’ll put it in a separate package (com.google.gwt.sample.stockwatcher.server)
+
+Difference between service and serviceAsync:
+--------------------------------------------
+
+It must have the same name as the service interface, appended with Async (for example, StockPriceServiceAsync).
+It must be located in the same package as the service interface.
+Each method must have the same name and signature as in the service interface with an important difference: the method has no return type and the last parameter is an AsyncCallback object.
+
+Error without serializing the object in Gwt RPC:
+------------------------------------------------
+
+[ERROR] Type 'com.google.gwt.sample.stockwatcher.client.StockPrice' was not serializable and has no concrete serializable subtypes
+
+In the service implementation (StockPriceServiceImpl), you inherited the code that serializes and deserializes Java objects by extending the RemoteServiceServlet class. However the problem is that we did not also edit the StockPrice class to indicate it was serializable.
+
+Note:
+-----
+GWT honors the transient keyword, so values in those fields are not serialized (and thus, not sent over the wire when used in RPC calls).
+
+Note: 
+-----
+GWT serialization is not the same as serialization based on the Java Serializable interface.
+
+
+
+
+
+
+
